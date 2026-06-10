@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Cup 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d1b2a;
+            color: #f8f9fa;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #1b4965, #62b6cb);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .painel-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .destaque {
+            color: #e9c46a;
+            font-weight: bold;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilo do Campo */
+        .campo-container {
+            background: #1e3d2f;
+            border: 4px solid #fff;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .linha-campo {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .vaga-jogador {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            width: 100px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .vaga-jogador:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .vaga-jogador.ocupada {
+            background: #1b4965;
+            border: 2px solid #62b6cb;
+        }
+
+        .vaga-jogador img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        .nome-vaga {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .preco-vaga {
+            font-size: 0.75rem;
+            color: #e9c46a;
+        }
+
+        .botao-remover {
+            margin-top: 5px;
+            background: #e63946;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        /* Estilo do Mercado */
+        .mercado-container {
+            background: #1b263b;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .mercado-container h2 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #415a77;
+            padding-bottom: 5px;
+        }
+
+        .lista-mercado {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .card-jogador {
+            background: #415a77;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .card-jogador:hover {
+            background: #778da9;
+        }
+
+        .info-jogador h4 {
+            font-size: 1.1rem;
+        }
+
+        .info-jogador p {
+            font-size: 0.85rem;
+            color: #e0e1dd;
+        }
+
+        .acao-jogador {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preco-jogador {
+            color: #e9c46a;
+            font-weight: bold;
+        }
+
+        .btn-comprar {
+            background: #2a9d8f;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-comprar:hover {
+            background: #21867a;
+        }
+
+        .btn-comprar:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Fantasy Cup 2026 ⚽</h1>
+        <div class="painel-info">
+            <div>Orçamento: <span id="saldo" class="destaque">$100.0M</span></div>
+            <div>Jogadores: <span id="num-jogadores" class="destaque">0/5</span></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Lado Esquerdo: O Campo Visual -->
+        <div class="campo-container">
+            <!-- Linha de Ataque -->
+            <div class="linha-campo">
+                <div class="vaga-jogador" id="vaga-ATA" onclick="focarPosicao('ATA')">
+                    <span class="nome-vaga">Escalar ATA</span>
+                </div>
+            </div>
+            <!-- Linha de Meio Campo -->
+            <div class="linha-campo">
+                <div class="vaga-jogador" id="vaga-MEI_1" onclick="focarPosicao('MEI_1')">
+                    <span class="nome-vaga">Escalar MEI</span>
+                </div>
+                <div class="vaga-jogador" id="vaga-MEI_2" onclick="focarPosicao('MEI_2')">
+                    <span class="nome-vaga">Escalar MEI</span>
+                </div>
+            </div>
+            <!-- Linha de Defesa -->
+            <div class="linha-campo">
+                <div class="vaga-jogador" id="vaga-DEF" onclick="focarPosicao('DEF')">
+                    <span class="nome-vaga">Escalar DEF</span>
+                </div>
+            </div>
+            <!-- Goleiro -->
+            <div class="linha-campo">
+                <div class="vaga-jogador" id="vaga-GOL" onclick="focarPosicao('GOL')">
+                    <span class="nome-vaga">Escalar GOL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lado Direito: O Mercado -->
+        <div class="mercado-container">
+            <h2 id="titulo-mercado">Mercado de Jogadores</h2>
+            <div class="lista-mercado" id="lista-jogadores">
+                <!-- Injetado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados simulado dos atletas da Copa 2026
+        const bancoJogadores = [
+            { id: 1, nome: "Vinícius Jr.", posicao: "ATA", selecao: "Brasil", preco: 22.0 },
+            { id: 2, nome: "Kylian Mbappé", posicao: "ATA", selecao: "França", preco: 24.5 },
+            { id: 3, nome: "Harry Kane", posicao: "ATA", selecao: "Inglaterra", preco: 20.0 },
+            { id: 4, nome: "Erling Haaland", posicao: "ATA", selecao: "Noruega", preco: 21.0 },
+            { id: 5, nome: "Jude Bellingham", posicao: "MEI", selecao: "Inglaterra", preco: 18.0 },
+            { id: 6, nome: "Kevin De Bruyne", posicao: "MEI", selecao: "Bélgica", preco: 16.5 },
+            { id: 7, nome: "Rodri", posicao: "MEI", selecao: "Espanha", preco: 15.0 },
+            { id: 8, nome: "Lucas Paquetá", posicao: "MEI", selecao: "Brasil", preco: 12.0 },
+            { id: 9, nome: "Virgil van Dijk", posicao: "DEF", selecao: "Holanda", preco: 13.5 },
+            { id: 10, nome: "Marquinhos", posicao: "DEF", selecao: "Brasil", preco: 11.0 },
+            { id: 11, nome: "Alisson Becker", posicao: "GOL", selecao: "Brasil", preco: 10.0 },
+            { id: 12, nome: "Thibaut Courtois", posicao: "GOL", selecao: "Bélgica", preco: 9.5 }
+        ];
+
+        // Estado inicial da aplicação
+        let estado = {
+            saldo: 100.0,
+            escalacao: {
+                ATA: null,
+                MEI_1: null,
+                MEI_2: null,
+                DEF: null,
+                GOL: null
+            }
+        };
+
+        // Carregar do localStorage se existir
+        if (localStorage.getItem('fantasyCup2026')) {
+            estado = JSON.parse(localStorage.getItem('fantasyCup2026'));
+        }
+
+        let posicaoSelecionada = 'ATA';
+
+        function renderizarMercado() {
+            const listaDiv = document.getElementById('lista-jogadores');
+            const tituloMercado = document.getElementById('titulo-mercado');
+            
+            // Simplifica a exibição da posição na busca do mercado
+            const posFiltrada = posicaoSelecionada.startsWith('MEI') ? 'MEI' : posicaoSelecionada;
+            tituloMercado.innerText = `Mercado - Posição: ${posFiltrada}`;
+
+            listaDiv.innerHTML = '';
+
+            const jogadoresFiltrados = bancoJogadores.filter(j => j.posicao === posFiltrada);
+
+            jogadoresFiltrados.forEach(jogador => {
+                // Verificar se o jogador já está escalado em alguma vaga
+                const jaEscalado = Object.values(estado.escalacao).some(es => es && es.id === jogador.id);
+
+                const card = document.createElement('div');
+                card.className = 'card-jogador';
+                card.innerHTML = `
+                    <div class="info-jogador">
+                        <h4>${jogador.nome}</h4>
+                        <p>${jogador.posicao} | ${jogador.selecao}</p>
+                    </div>
+                    <div class="acao-jogador">
+                        <span class="preco-jogador">$${jogador.preco.toFixed(1)}M</span>
+                        <button class="btn-comprar" ${jaEscalado || estado.saldo < jogador.preco ? 'disabled' : ''} onclick="comprarJogador(${jogador.id})">
+                            ${jaEscalado ? 'Escalado' : 'Contratar'}
+                        </button>
+                    </div>
+                `;
+                listaDiv.appendChild(card);
+            });
+        }
+
+        function renderizarCampo() {
+            let totalJogadores = 0;
+
+            for (const vaga in estado.escalacao) {
+                const jogador = estado.escalacao[vaga];
+                const vagaDiv = document.getElementById(`vaga-${vaga}`);
+
+                if (jogador) {
+                    totalJogadores++;
+                    vagaDiv.className = "vaga-jogador ocupada";
+                    vagaDiv.innerHTML = `
+                        <span class="nome-vaga">${jogador.nome}</span>
+                        <span class="preco-vaga">$${jogador.preco.toFixed(1)}M</span>
+                        <button class="botao-remover" onclick="event.stopPropagation(); removerJogador('${vaga}')">Vender</button>
+                    `;
+                } else {
+                    vagaDiv.className = "vaga-jogador";
+                    vagaDiv.innerHTML = `<span class="nome-vaga">Escalar ${vaga.startsWith('MEI') ? 'MEI' : vaga}</span>`;
+                }
+            }
+
+            document.getElementById('saldo').innerText = `$${estado.saldo.toFixed(1)}M`;
+            document.getElementById('num-jogadores').innerText = `${totalJogadores}/5`;
+        }
+
+        function focarPosicao(vaga) {
+            posicaoSelecionada = vaga;
+            renderizarMercado();
+        }
+
+        function comprarJogador(id) {
+            const jogador = bancoJogadores.find(j => j.id === id);
+            
+            // Se a vaga já tiver jogador, vende ele primeiro automaticamente
+            if (estado.escalacao[posicaoSelecionada]) {
+                removerJogador(posicaoSelecionada);
+            }
+
+            if (estado.saldo >= jogador.preco) {
+                estado.saldo -= jogador.preco;
+                estado.escalacao[posicaoSelecionada] = jogador;
+                salvarEAtualizar();
+            }
+        }
+
+        function removerJogador(vaga) {
+            const jogador = estado.escalacao[vaga];
+            if (jogador) {
+                estado.saldo += jogador.preco;
+                estado.escalacao[vaga] = null;
+                salvarEAtualizar();
+            }
+        }
+
+        function salvarEAtualizar() {
+            localStorage.setItem('fantasyCup2026', JSON.stringify(estado));
+            renderizarCampo();
+            renderizarMercado();
+        }
+
+        // Inicialização
+        renderizarCampo();
+        renderizarMercado();
+    </script>
+</body>
+</html>
